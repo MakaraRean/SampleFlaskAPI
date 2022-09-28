@@ -131,10 +131,8 @@ async def authUser(current_user: User = Depends(get_current_user),token: HTTPBea
     try:
         if token.credentials == Token.access_token:
             return current_user
-        else:
-            return {"message": "Token is invalid"}
-    except Exception as ex:
-        return {"message": f"Token invalid, {ex}"}
+    except HTTPException as ex:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=ex.detail)
 
 
 

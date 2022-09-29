@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 from typing import Union, Optional
 import bcrypt
+import sqlalchemy
 from fastapi import Depends, FastAPI, HTTPException, Response, Request, Header,Security
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2AuthorizationCodeBearer, HTTPBearer
 from flask import jsonify
@@ -115,9 +116,8 @@ async def get_current_user(response: Response,authorize: HTTPBearer = Depends(oa
 #         raise credentials_exeption
 #     return {"id": userDB.id, "username": username, "exp": exp, "token": token}
 
-
 @app.get("/user/me", summary="Get auth user", dependencies=[Depends(Auth)])
-async def authUser(current_user: User = Depends(get_current_user),token: HTTPBearer = Depends(oauth2_scheme)):
+async def authUser(current_user: User = Depends(get_current_user),token: HTTPBearer = Depends(oauth2_scheme),authorize: AuthJWT = Depends()):
     # payload = jwt.decode(token=token,key=SECTET_KEY,algorithms=ALGORITHM)
     # credential = payload.get('credentials')
     # print(credential)
@@ -127,10 +127,11 @@ async def authUser(current_user: User = Depends(get_current_user),token: HTTPBea
     #         return current_user
     # except Exception as ex:
     #     return {"message": "Token invalid", "Exeption": ex}
-    print(token.credentials)
     try:
-        if token.credentials == Token.access_token:
-            return current_user
+            data = authorize.get_raw_jwt()
+            return data
+    except KeyError as e:
+        raise e.__dict__
     except HTTPException as ex:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=ex.detail)
 
@@ -153,8 +154,8 @@ async def register(request: requestUser):
         session.add(user)
         session.commit()
         return {"message": "New user create successfully"}
-    except Exception as ex:
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="username is already exist.")
+    except HTTPException as ex:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="username is already exist."+ex.detail)
 
 
 def verify_password(password: str, hashed_password: str) -> bool:
@@ -209,9 +210,10 @@ def refresh_token(request: RefreshToken,authorize: AuthJWT = Depends()):
     payload = jwt.decode(request.refresh,key=SECTET_KEY,algorithms=ALGORITHM)
     sub = payload.get('sub')
     print(sub)
-    new_access_token = authorize.create_access_token(subject= sub,expires_time=ACCESS_TOKEN_EXPIRE_MINUTES,algorithm=ALGORITHM,fresh=True)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    new_access_token = authorize.create_access_token(subject= sub,expires_time=access_token_expires,algorithm=ALGORITHM,fresh=True)
     Token.access_token = new_access_token
-    return {"access_token": new_access_token}
+    return {"new_token": new_access_token}
 
 # @app.delete("/access_revoke")
 # def access_revoke(authorize: AuthJWT = Depends()):

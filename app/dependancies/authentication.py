@@ -1,13 +1,10 @@
-import base64
 import datetime
-import logging
 from datetime import timedelta
 from typing import Union, Optional
 import bcrypt
-import sqlalchemy
+import jwt
 from fastapi import Depends, FastAPI, HTTPException, Response, Request, Header,Security
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2AuthorizationCodeBearer, HTTPBearer
-from flask import jsonify
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 from app.dependancies.auth import authentication as Auth, SECTET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM
@@ -22,7 +19,7 @@ from database import Session
 from routes.routers import user
 from app.pydantic.request import User as requestUser, TokenData, RefreshToken
 from passlib.context import CryptContext
-from jose import jwt
+# from jose import jwt
 
 router = FastAPI()
 app = user

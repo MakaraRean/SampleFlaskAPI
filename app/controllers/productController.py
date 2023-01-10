@@ -1,20 +1,10 @@
-import datetime
-import http
-from http.client import error
-
-import jwt
 import uvicorn
-from fastapi import FastAPI,Response,status,Depends,Security
+from fastapi import FastAPI,Response,status,Depends
 from fastapi.security import OAuth2AuthorizationCodeBearer,HTTPBearer
-from fastapi_sqlalchemy import db
-# from sqlalchemy.orm import session
-
-from app.dependancies.pagging import pagging
 from app.models.models import Product
 from app.pydantic import request, productResponse
 from database import Session, Base, engine
 from routes.routers import product
-from http import HTTPStatus
 from app.dependancies.authentication import ALGORITHM, SECTET_KEY, Token
 from app.dependancies.auth import authentication as Auth
 

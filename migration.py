@@ -1,4 +1,4 @@
-from models import Category, User, Product
+from app.models.models import Category, User, Product
 from database import Base,engine,Session
 from datetime import datetime
 

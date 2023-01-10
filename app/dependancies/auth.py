@@ -1,7 +1,6 @@
 from fastapi import Depends, Request, HTTPException
 from fastapi.openapi.models import Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from starlette_context import context
 import jwt
 from starlette import status
 

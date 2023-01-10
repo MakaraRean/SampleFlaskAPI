@@ -4,9 +4,9 @@ from sqlalchemy.orm import sessionmaker
 
 host = "localhost"
 port = 5432
-dbName = "sqlalchemy"
+dbName = "sample_fast_api"
 username = "postgres"
-password = "Mkr225566"
+password = "123"
 
 DATABASE_URI = f'postgresql://{username}:{password}@{host}:{port}/{dbName}'
 
